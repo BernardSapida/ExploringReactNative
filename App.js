@@ -1,20 +1,37 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useState } from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
+import TaskItem from './components/TaskItems';
+import TaskInput from './components/TaskInput';
 
 export default function App() {
+  const [tasks, setTasks] = useState([]);
+
+  const addTaskHandler = (text) => {
+    setTasks(currentTasks => [...currentTasks, {id: Date.now(), text: text}])
+  }
+
+  const deleteTaskHandler = (id) => {
+    console.log(id)
+
+    setTasks(currentTasks => currentTasks.filter(task => {
+      if(task.id !== id) {
+        return task;
+      }
+    }))
+  }
+
   return (
     <View style={styles.appContainer}>
-      <View style={styles.inputContainer}>
-        <TextInput style={styles.textInput} placeholder='Your task'/>
-        <Button title='Add Task' />
-      </View>
-      <View style={styles.goalContainer}>
-        <Text style={styles.goalTitle}>List of Task</Text>
-        <Text style={styles.goalList}>Magcode</Text>
-        <Text style={styles.goalList}>Magaral</Text>
-        <Text style={styles.goalList}>Hangout with friends</Text>
-        <Text style={styles.goalList}>Kayquit Portal System</Text>
-        <Text style={styles.goalList}>Play Sky</Text>
+      <TaskInput addTaskHandler={addTaskHandler} />
+      <View style={styles.taskContainer}>
+        <Text style={styles.taskTitle}>List of Tasks</Text>
+        <FlatList 
+          data={tasks} 
+          renderItem={task => (<TaskItem task={task.item} deleteTaskHandler={deleteTaskHandler}/>)} 
+          keyExtractor={(item, index) => item.id}
+        />
+        {/* {tasks.length === 0 ? (<Text style={styles.TaskItem}>No tasks</Text>) : (tasks.map((task, index) => (<Text key={index} style={styles.TaskItem}>{task}</Text>)))} */}
       </View>
       <StatusBar style="auto" />
     </View>
@@ -23,41 +40,21 @@ export default function App() {
 
 const styles = StyleSheet.create({
   appContainer: {
-    margin: 50,
+    padding: 50,
+    height: '100%',
+    backgroundColor: '#080808'
   },
-  inputContainer: {
-    flexDirection: 'row',
-    alignContent: 'center',
-    justifyContent: 'space-between',
-    gap: 5,
-    width: '100%',
-    padding: 5
+  taskContainer: {
+    height: '100%',
+    paddingBottom: 30,
+    marginVertical: 10,
+    paddingVertical: 10,
   },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    width: '70%',
-    borderRadius: 5,
-    padding: 5
-  },
-  goalContainer: {
-    marginTop: 10
-  },
-  goalTitle: {
+  taskTitle: {
     textAlign: 'center',
     fontSize: 24,
-    fontWeight: '500'
+    paddingVertical: 10,
+    fontWeight: '500',
+    color: '#F5F5F5'
   },
-  goalList: {
-    fontSize: 18,
-    padding: 10,
-    marginVertical: 5,
-    borderRadius: 5,
-    elevation: 0.5,
-    backgroundColor: '#fafafa',
-    shadowOffset: { width: 10, height: 10 },
-    shadowOpacity: -1,
-    shadowRadius: 10,
-    overflow: 'hidden',
-  }
 });
